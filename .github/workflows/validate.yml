@@ -19,8 +19,7 @@ jobs:
           pip install pylint
       - name: Analysing the code with pylint
         run: |
-          cd flood_nowcasting
-          pylint ../flood_nowcasting
+          pylint flood_nowcasting
 
   test:
 
