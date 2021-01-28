@@ -13,7 +13,7 @@ BASE_URL = "https://environment.data.gov.uk/flood-monitoring/id/measures/"
 
 def get_data(location: Location, readings: int = 24) -> Tuple[List[int], List[float]]:
     """
-    Return x and y
+    Return x and y data
     :param location: Location
     :param readings: int
     :return: Tuple[List[int], List[float]] - X in seconds, Y in decimal meters
@@ -22,12 +22,12 @@ def get_data(location: Location, readings: int = 24) -> Tuple[List[int], List[fl
     with urlopen(url) as response:
         raw = response.read()
         json_data = json.loads(raw)
-        x = [datetime.strptime(reading['dateTime'],
-                               '%Y-%m-%dT%H:%M:%SZ').timestamp() for reading in
-             json_data['items']]
+        x_data = [datetime.strptime(reading['dateTime'],
+                                    '%Y-%m-%dT%H:%M:%SZ').timestamp() for reading in
+                  json_data['items']]
         # need to rebase the time-series as big numbers don't work very well for plotting and
         # exact time doesn't matter, just relative
-        x_min = min(x)
-        x = [int(point - x_min) for point in x]
-        y = [float(reading['value']) for reading in json_data['items']]
-    return x, y
+        x_min = min(x_data)
+        x_data = [int(point - x_min) for point in x_data]
+        y_data = [float(reading['value']) for reading in json_data['items']]
+    return x_data, y_data

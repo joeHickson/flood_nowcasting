@@ -84,6 +84,8 @@ def get_current_output_state(location: Location) -> FloodStates:
     :param location: Location
     :return: FloodStates
     """
+    wet = location.wet
+    wet += 1  #todo: something here!
     return FloodStates.CARE
 
 
@@ -117,8 +119,15 @@ def calculate_new_state(prior_state: FloodStates, current_level: float, forecast
     return calc_state
 
 
-def publish(location, message):
-    pass
+def publish(location: Location, message: str):
+    """
+    Publish the message to twitter
+    :param location: Location
+    :param message: str
+    :return:
+    """
+    output = message
+    output += f" {location.name}"
 
 
 if __name__ == '__main__':
