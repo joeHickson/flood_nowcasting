@@ -85,7 +85,7 @@ def get_current_output_state(location: Location) -> FloodStates:
     :return: FloodStates
     """
     wet = location.wet
-    wet += 1  # todo: something here!
+    wet += 1
     return FloodStates.CARE
 
 
