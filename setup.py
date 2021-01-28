@@ -8,6 +8,9 @@ with open('README.md') as f:
 with open('LICENSE') as f:
     license = f.read()
 
+with open('requirements.txt') as f:
+    requirements = f.read()
+
 setup(
     name='flood_nowcasting',
     version='0.1.0',
@@ -16,5 +19,6 @@ setup(
     author='Joe Hickson',
     url='https://github.com/joehickson/flood_nowcasting',
     license=license,
-    packages=find_packages(exclude=('tests'))
+    packages=find_packages(exclude=('tests', 'docs')),
+    install_requires=requirements
 )
