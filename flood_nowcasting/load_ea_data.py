@@ -30,4 +30,8 @@ def get_data(location: Location, readings: int = 24) -> Tuple[List[int], List[fl
         x_min = min(x_data)
         x_data = [int(point - x_min) for point in x_data]
         y_data = [float(reading['value']) for reading in json_data['items']]
+
+        # flip it - the api provides newest first (reverse chronological order)
+        x_data.reverse()
+        y_data.reverse()
     return x_data, y_data

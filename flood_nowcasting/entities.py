@@ -31,8 +31,14 @@ class FloodStates(Enum):
     def __lt__(self, other):
         return int(self.value) < other
 
+    def __le__(self, other):
+        return int(self.value) <= other
+
     def __gt__(self, other):
         return int(self.value) > other
+
+    def __ge__(self, other):
+        return int(self.value) >= other
 
     def __eq__(self, other):
         return int(self.value) == other

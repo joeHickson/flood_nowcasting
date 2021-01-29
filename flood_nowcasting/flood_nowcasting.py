@@ -44,6 +44,12 @@ def main():
 
 
 def nowcast(x_values, y_values):
+    """
+    generate the nowcast for the next hour
+    :param x_values:
+    :param y_values:
+    :return:
+    """
     # estimate the coefficients
     coefficients = poly.polyfit(x_values, y_values, 2)
     # optionally plot the outcome
@@ -122,6 +128,8 @@ def calculate_new_state(prior_state: FloodStates, current_level: float, forecast
             calc_state = FloodStates.CLEAR_VERY_SOON
         elif forecast[1] < wet_threshold:  # down in an hour
             calc_state = FloodStates.CLEAR_SOON
+    elif current_level >= wet_threshold:
+        calc_state = FloodStates.WET
     return calc_state
 
 
