@@ -24,25 +24,14 @@ def main():
         # load up the data
         x_values, y_values = get_data(location)
 
-        # estimate the coefficients
-        coefficients = poly.polyfit(x_values, y_values, 2)
-
-        # optionally plot the outcome
-        # x_new = np.linspace(x_values[0], x_values[-1] * 1.5, num=len(x_values) * 10)
-        # ffit = poly.polyval(x_new, coefficients)
-        #
-        # plt.plot(x_new, ffit)
-        # plt.plot(x_values, y_values, 'o')
-        # plt.show()
-
-        # use the calculated coefficients to estimate t+30 and t+60 minutes
-        forecast_levels = poly.polyval([x_values[-1] + 1800, x_values[-1] + 3600], coefficients)
+        current_level = y_values[-1]
+        forecast_levels = nowcast(x_values, y_values)
 
         # load the current published state and calculate the new state
         current_output_state = get_current_output_state(location)
         new_state = calculate_new_state(
             prior_state=current_output_state,
-            current_level=y_values[-1],
+            current_level=current_level,
             forecast=forecast_levels,
             warn_threshold=location.warn,
             wet_threshold=location.wet
@@ -54,12 +43,29 @@ def main():
             publish(location, message)
 
 
+def nowcast(x_values, y_values):
+    # estimate the coefficients
+    coefficients = poly.polyfit(x_values, y_values, 2)
+    # optionally plot the outcome
+    # x_new = np.linspace(x_values[0], x_values[-1] * 1.5, num=len(x_values) * 10)
+    # ffit = poly.polyval(x_new, coefficients)
+    #
+    # plt.plot(x_new, ffit)
+    # plt.plot(x_values, y_values, 'o')
+    # plt.show()
+    # use the calculated coefficients to estimate t+30 and t+60 minutes
+    forecast_levels = poly.polyval([x_values[-1] + 1800, x_values[-1] + 3600], coefficients)
+    return forecast_levels
+
+
 def get_locations() -> Set[Location]:
     """
     get a list of all the defined locations
     :return: Set[Location]
     """
     locations = {
+        # Exeter flood defence cycle path - trews wier at 3.89 (and slowly falling) path is part covered
+        # .../flood-monitoring/data/readings/45128-level-stage-i-15_min-m/2021-01-28T17-45-00Z
         Location(
             name="Exeter flood defence cycle path",
             monitoring_station="45128",
