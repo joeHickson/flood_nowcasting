@@ -5,7 +5,7 @@ Useful where key infrastructure is within flood defences and not considered "in 
 - such as the E1 / NCN34 along the edge of the river exe between Exeter St Davids and Exeter Quay
 """
 import argparse
-from typing import Set
+from typing import Set, Union
 
 import numpy.polynomial.polynomial as poly
 import tweepy
@@ -14,8 +14,9 @@ from numpy.core.multiarray import ndarray
 from entities import FloodStates, Location
 from load_ea_data import get_data
 
-
 # import matplotlib.pyplot as plt
+
+API: Union[tweepy.API, None] = None
 
 
 def main():
@@ -190,9 +191,24 @@ def args():
     return parser.parse_args()
 
 
+def setup(app_key: str, app_secret: str, access_token: str, access_token_secret: str):
+    """
+    Configure API
+    :param app_key:str
+    :param app_secret:str
+    :param access_token: str
+    :param access_token_secret:str
+    :return:
+    """
+    # pylint: disable=W0603
+    global API
+    auth = tweepy.OAuthHandler(app_key, app_secret)
+    auth.set_access_token(access_token, access_token_secret)
+    API = tweepy.API(auth)
+
+
 if __name__ == '__main__':
     args = args()
-    auth = tweepy.OAuthHandler(args.app_key, args.app_secret)
-    auth.set_access_token(args.access_token, args.access_token_secret)
-    API = tweepy.API(auth)
+    setup(app_key=args.app_key, app_secret=args.app_secret, access_token=args.access_token,
+          access_token_secret=args.access_token_secret)
     main()
