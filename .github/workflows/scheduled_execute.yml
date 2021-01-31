@@ -1,4 +1,4 @@
-name: Execute
+name: Scheduled Execute
 
 on:
   schedule:
