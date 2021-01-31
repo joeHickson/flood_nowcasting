@@ -177,6 +177,10 @@ def publish(message: str):
 
 
 def args():
+    """
+    Generate args for app
+    :return: dictionary of arguments
+    """
     parser = argparse.ArgumentParser("Tweet the flood state")
     parser.add_argument("--app_key", type=str, required=True, help="Twitter App Key")
     parser.add_argument("--app_secret", type=str, required=True, help="Twitter App Secret")
