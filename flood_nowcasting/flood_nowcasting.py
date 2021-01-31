@@ -4,9 +4,11 @@ Using the environment agency api to estimate if a section of river is in flood a
 Useful where key infrastructure is within flood defences and not considered "in flood" by the EA
 - such as the E1 / NCN34 along the edge of the river exe between Exeter St Davids and Exeter Quay
 """
+import argparse
 from typing import Set
 
 import numpy.polynomial.polynomial as poly
+import tweepy
 from numpy.core.multiarray import ndarray
 
 from entities import FloodStates, Location
@@ -40,7 +42,10 @@ def main():
         if new_state != current_output_state:  # publicise change:
             message = location.get_message(new_state)
 
-            publish(location, message)
+            publish(message)
+        #     print(f"published message {message}")
+        # else:
+        #     print(f"no change for location {location.name}")
 
 
 def nowcast(x_values, y_values):
@@ -73,17 +78,39 @@ def get_locations() -> Set[Location]:
         # Exeter flood defence cycle path - trews wier at 3.89 (and slowly falling) path is part covered
         # .../flood-monitoring/data/readings/45128-level-stage-i-15_min-m/2021-01-28T17-45-00Z
         Location(
-            name="Exeter flood defence cycle path",
+            name="Millers Crossing and the Quay",
             monitoring_station="45128",
             wet=3.88,
             warn=3.86,
             messages={
-                FloodStates.DRY: "Flood defence cycle path all clear",
-                FloodStates.WARN: "Possibility of flooding soon on flood defence cycle path",
-                FloodStates.CARE: "Flood defence cycle path may be passable",
-                FloodStates.WET: "Flood defence cycle path is wet. Plan an alternative route",
-                FloodStates.CLEAR_SOON: "Flood defence cycle path may be dry in 1 hour",
-                FloodStates.CLEAR_VERY_SOON: "Flood defence cycle path may be dry in 1/2 hour"
+                FloodStates.DRY: "Flood defence path between Millers Crossing and the Quay is clear",
+                FloodStates.WARN: "Possibility of flooding soon on the flood defence path between "
+                                  "Millers Crossing and the Quay",
+                FloodStates.CARE: "Flood defence path between Millers Crossing and the Quay may be passable",
+                FloodStates.WET: "Flood defence path between Millers Crossing and the Quay is wet. "
+                                 "Plan an alternative route",
+                FloodStates.CLEAR_SOON: "Flood defence path between Millers Crossing and the Quay "
+                                        "may be dry in 1 hour",
+                FloodStates.CLEAR_VERY_SOON: "Flood defence path between Millers Crossing and the Quay "
+                                             "may be dry in 1/2 hour"
+            }
+        ),
+        Location(
+            name="St David's and Millers Crossing",
+            monitoring_station="45128",
+            wet=4.03,
+            warn=4.00,
+            messages={
+                FloodStates.DRY: "Flood defence path between St David's and Millers Crossing is clear",
+                FloodStates.WARN: "Possibility of flooding soon on the flood defence path between "
+                                  "St David's and Millers Crossing",
+                FloodStates.CARE: "Flood defence path between St David's and Millers Crossing may be passable",
+                FloodStates.WET: "Flood defence path between St David's and Millers Crossing is wet. "
+                                 "Plan an alternative route",
+                FloodStates.CLEAR_SOON: "Flood defence path between St David's and Millers Crossing "
+                                        "may be dry in 1 hour",
+                FloodStates.CLEAR_VERY_SOON: "Flood defence path between St David's and Millers Crossing "
+                                             "may be dry in 1/2 hour"
             }
         )
     }
@@ -96,9 +123,16 @@ def get_current_output_state(location: Location) -> FloodStates:
     :param location: Location
     :return: FloodStates
     """
-    wet = location.wet
-    wet += 1
-    return FloodStates.CARE
+    match = FloodStates.DRY
+    recent = API.user_timeline(user_id='ExeFloodChannel')
+    for tweet in recent:
+        if tweet.text in location.messages.values():
+            for state in location.messages.keys():
+                if tweet.text == location.messages[state]:
+                    match = state
+                    break
+
+    return match
 
 
 def calculate_new_state(prior_state: FloodStates, current_level: float, forecast: ndarray, warn_threshold: float,
@@ -133,16 +167,28 @@ def calculate_new_state(prior_state: FloodStates, current_level: float, forecast
     return calc_state
 
 
-def publish(location: Location, message: str):
+def publish(message: str):
     """
     Publish the message to twitter
-    :param location: Location
     :param message: str
     :return:
     """
-    output = message
-    output += f" {location.name}"
+    API.update_status(status=message)
+
+
+def args():
+    parser = argparse.ArgumentParser("Tweet the flood state")
+    parser.add_argument("--app_key", type=str, required=True, help="Twitter App Key")
+    parser.add_argument("--app_secret", type=str, required=True, help="Twitter App Secret")
+    parser.add_argument("--access_token", type=str, required=True, help="Twitter Account Access Token")
+    parser.add_argument("--access_token_secret", type=str, required=True, help="Twitter Account Access Token Secret")
+    # process arguments
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
+    args = args()
+    auth = tweepy.OAuthHandler(args.app_key, args.app_secret)
+    auth.set_access_token(args.access_token, args.access_token_secret)
+    API = tweepy.API(auth)
     main()
