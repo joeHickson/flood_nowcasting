@@ -1,5 +1,9 @@
 import json
 import os
+import sys
+
+# bugger about with the path to include the package. not the right way really.
+sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/flood_nowcasting")
 
 from flood_nowcasting.flood_nowcasting import FloodNowcasting
 
