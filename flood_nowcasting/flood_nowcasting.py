@@ -136,7 +136,7 @@ class FloodNowcasting:
         :param location: Location
         :return: FloodStates
         """
-        match = FloodStates.DRY
+        match = None
         recent = self.api.user_timeline(user_id='ExeFloodChannel')
         for tweet in recent:
             if tweet.text in location.messages.values():
@@ -144,6 +144,8 @@ class FloodNowcasting:
                     if tweet.text == location.messages[state]:
                         match = state
                         break
+            if match:
+                break
 
         return match
 
