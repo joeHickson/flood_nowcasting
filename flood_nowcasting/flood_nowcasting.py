@@ -187,7 +187,13 @@ class FloodNowcasting:
         :param message: str
         :return:
         """
-        self.api.update_status(status=message)
+        try:
+            self.api.update_status(status=message)
+        except tweepy.error.TweepError as error:
+            if error.api_code == 187:  # Status is a duplicate
+                pass
+            else:
+                raise
 
 
 def args():
