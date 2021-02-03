@@ -11,12 +11,12 @@ from entities import Location
 BASE_URL = "https://environment.data.gov.uk/flood-monitoring/id/measures/"
 
 
-def get_data(location: Location, readings: int = 24) -> Tuple[List[int], List[float]]:
+def get_data(location: Location, readings: int = 24) -> Tuple[List[int], List[float], datetime]:
     """
     Return x and y data
     :param location: Location
     :param readings: int
-    :return: Tuple[List[int], List[float]] - X in seconds, Y in decimal meters
+    :return: Tuple[List[int], List[float], datetime] - X in seconds, Y in decimal meters, last sample timestamp
     """
     url = f"{BASE_URL}{location.monitoring_station}-level-stage-i-15_min-m/readings?_sorted&_limit={readings}"
     with urlopen(url) as response:
@@ -28,10 +28,11 @@ def get_data(location: Location, readings: int = 24) -> Tuple[List[int], List[fl
         # need to rebase the time-series as big numbers don't work very well for plotting and
         # exact time doesn't matter, just relative
         x_min = min(x_data)
+        x_max = max([datetime.strptime(reading['dateTime'], '%Y-%m-%dT%H:%M:%SZ') for reading in json_data['items']])
         x_data = [int(point - x_min) for point in x_data]
         y_data = [float(reading['value']) for reading in json_data['items']]
 
         # flip it - the api provides newest first (reverse chronological order)
         x_data.reverse()
         y_data.reverse()
-    return x_data, y_data
+    return x_data, y_data, x_max
