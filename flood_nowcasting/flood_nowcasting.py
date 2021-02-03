@@ -141,7 +141,7 @@ class FloodNowcasting:
         for tweet in recent:
             if tweet.text in location.messages.values():
                 for state in location.messages.keys():
-                    if tweet.text == location.messages[state]:
+                    if location.messages[state] in tweet.text:
                         match = state
                         break
             if match:
