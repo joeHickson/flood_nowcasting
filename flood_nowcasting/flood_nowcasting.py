@@ -39,12 +39,12 @@ class FloodNowcasting:
         for location in self.get_locations():
             # load up the data
             x_values, y_values, latest_timestamp = get_data(location)
-
+            message_suffix = f" (latest reading was at {latest_timestamp: %I:%M %p %d/%m/%Y})"
             current_level = y_values[-1]
             forecast_levels = self.nowcast(x_values, y_values)
 
             # load the current published state and calculate the new state
-            current_output_state = self.get_current_output_state(location)
+            current_output_state = self.get_current_output_state(location, len(message_suffix))
             new_state = self.calculate_new_state(
                 prior_state=current_output_state,
                 current_level=current_level,
@@ -55,7 +55,7 @@ class FloodNowcasting:
 
             if new_state != current_output_state:  # publicise change:
                 message = location.get_message(new_state)
-                message += f" (latest reading was at {latest_timestamp: %I:%M %p %d/%m/%Y})"
+                message += message_suffix
                 self.publish(message)
             #     print(f"published message {message}")
             # else:
@@ -130,18 +130,19 @@ class FloodNowcasting:
         }
         return locations
 
-    def get_current_output_state(self, location: Location) -> FloodStates:
+    def get_current_output_state(self, location: Location, suffix_len: int) -> FloodStates:
         """
         load the previously published output state
         :param location: Location
+        :param suffix_len: int - how much to trim off the end
         :return: FloodStates
         """
         match = None
         recent = self.api.user_timeline(user_id='ExeFloodChannel')
         for tweet in recent:
-            if tweet.text in location.messages.values():
+            if len(tweet.text) > suffix_len and tweet.text[:suffix_len * -1] in location.messages.values():
                 for state in location.messages.keys():
-                    if location.messages[state] == tweet.text[:-45]:
+                    if location.messages[state] == tweet.text[:suffix_len * -1]:
                         match = state
                         break
             if match:
