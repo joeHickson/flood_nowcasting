@@ -39,7 +39,7 @@ class FloodNowcasting:
         for location in self.get_locations():
             # load up the data
             x_values, y_values, latest_timestamp = get_data(location)
-            message_suffix = f" (latest reading was at {latest_timestamp: %I:%M %p %d/%m/%Y})"
+            message_suffix = f" (using data issued at: {latest_timestamp: %I:%M %p %d/%m/%Y})"
             current_level = y_values[-1]
             forecast_levels = self.nowcast(x_values, y_values)
 
