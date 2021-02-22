@@ -94,8 +94,8 @@ class FloodNowcasting:
             Location(
                 name="Millers Crossing and the Quay",
                 monitoring_station="45128",
-                wet=3.88,
-                warn=3.86,
+                wet=3.86,
+                warn=3.84,
                 messages={
                     FloodStates.DRY: "Flood defence path between Millers Crossing and the Quay is clear",
                     FloodStates.WARN: "Possibility of flooding soon on the flood defence path between "
