@@ -1,8 +1,13 @@
-import yaml
 import logging
+
+import yaml
+
 from flood_nowcasting.flood_nowcasting import FloodNowcasting
 
-logging.basicConfig(filename='run.log', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+logging.basicConfig(filename='run.log', level=logging.INFO,
+                    format='%(asctime)s %(message)s',
+                    datefmt='%m/%d/%Y %I:%M:%S %p')
+
 
 def load_config():
     with open("config.yaml", "r") as f:
