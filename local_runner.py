@@ -1,6 +1,12 @@
+import logging
+
 import yaml
 
 from flood_nowcasting.flood_nowcasting import FloodNowcasting
+
+logging.basicConfig(filename='run.log', level=logging.INFO,
+                    format='%(asctime)s %(message)s',
+                    datefmt='%m/%d/%Y %I:%M:%S %p')
 
 
 def load_config():
@@ -9,7 +15,7 @@ def load_config():
 
 
 if __name__ == '__main__':
-    print("running")
+    logging.info("run starting")
     config = load_config()
 
     nowcast = FloodNowcasting(app_key=config['APP_KEY'],
@@ -18,4 +24,4 @@ if __name__ == '__main__':
                               access_token_secret=config[
                                   'ACCESS_TOKEN_SECRET'])
     nowcast.main()
-    print("run complete")
+    logging.info("run complete")

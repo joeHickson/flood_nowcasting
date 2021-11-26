@@ -5,6 +5,7 @@ Useful where key infrastructure is within flood defences and not considered "in 
 - such as the E1 / NCN34 along the edge of the river exe between Exeter St Davids and Exeter Quay
 """
 import argparse
+import logging
 from typing import Set
 
 import numpy.polynomial.polynomial as poly
@@ -38,6 +39,7 @@ class FloodNowcasting:
         # loop over locations
         for location in self.get_locations():
             # load up the data
+            logging.debug("loading station %s", location.name)
             x_values, y_values, latest_timestamp = get_data(location)
             message_suffix = f" (using data issued at: {latest_timestamp: %I:%M %p %d/%m/%Y})"
             current_level = y_values[-1]
@@ -53,6 +55,8 @@ class FloodNowcasting:
                 wet_threshold=location.wet
             )
 
+            logging.debug("station %s old state:%s new state:%s", location.name, current_output_state.name,
+                          new_state.name)
             if new_state != current_output_state:  # publicise change:
                 message = location.get_message(new_state)
                 message += message_suffix
