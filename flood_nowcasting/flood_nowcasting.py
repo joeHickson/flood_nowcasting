@@ -191,7 +191,7 @@ class FloodNowcasting:
         try:
             self.api.update_status(status=message)
         except tweepy.errors.TweepyException as error:
-            if error.api_code == 187:  # Status is a duplicate
+            if 187 in error.api_codes:  # Status is a duplicate
                 pass
             else:
                 raise
