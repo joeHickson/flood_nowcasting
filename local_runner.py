@@ -2,7 +2,7 @@ import yaml
 import logging
 from flood_nowcasting.flood_nowcasting import FloodNowcasting
 
-logging.basicConfig(filename='cron.log', level=logging.INFO)
+logging.basicConfig(filename='run.log', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 def load_config():
     with open("config.yaml", "r") as f:
@@ -10,7 +10,7 @@ def load_config():
 
 
 if __name__ == '__main__':
-    logging.info("running")
+    logging.info("run starting")
     config = load_config()
 
     nowcast = FloodNowcasting(app_key=config['APP_KEY'],
