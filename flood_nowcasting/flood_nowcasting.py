@@ -6,7 +6,7 @@ Useful where key infrastructure is within flood defences and not considered "in 
 """
 import argparse
 from typing import Set
-
+import logging
 import numpy.polynomial.polynomial as poly
 import tweepy
 from numpy.core.multiarray import ndarray
@@ -38,6 +38,7 @@ class FloodNowcasting:
         # loop over locations
         for location in self.get_locations():
             # load up the data
+            logging.debug(f"loading station {location.name}")
             x_values, y_values, latest_timestamp = get_data(location)
             message_suffix = f" (using data issued at: {latest_timestamp: %I:%M %p %d/%m/%Y})"
             current_level = y_values[-1]
@@ -53,6 +54,7 @@ class FloodNowcasting:
                 wet_threshold=location.wet
             )
 
+            logging.debug(f"station {location.name} old state:{current_output_state.name} new state {new_state.name}")
             if new_state != current_output_state:  # publicise change:
                 message = location.get_message(new_state)
                 message += message_suffix

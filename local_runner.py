@@ -1,5 +1,6 @@
 import yaml
-
+import logging
+logging.basicConfig(filename='cron.log', encoding='utf-8', level=logging.DEBUG)
 from flood_nowcasting.flood_nowcasting import FloodNowcasting
 
 
@@ -9,7 +10,7 @@ def load_config():
 
 
 if __name__ == '__main__':
-    print("running")
+    logging.info("running")
     config = load_config()
 
     nowcast = FloodNowcasting(app_key=config['APP_KEY'],
@@ -18,4 +19,4 @@ if __name__ == '__main__':
                               access_token_secret=config[
                                   'ACCESS_TOKEN_SECRET'])
     nowcast.main()
-    print("run complete")
+    logging.info("run complete")
