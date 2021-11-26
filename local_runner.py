@@ -1,8 +1,8 @@
 import yaml
 import logging
-logging.basicConfig(filename='cron.log', encoding='utf-8', level=logging.DEBUG)
 from flood_nowcasting.flood_nowcasting import FloodNowcasting
 
+logging.basicConfig(filename='cron.log', level=logging.INFO)
 
 def load_config():
     with open("config.yaml", "r") as f:
