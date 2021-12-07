@@ -166,6 +166,8 @@ class FloodNowcasting:
         :param wet_threshold: float - the water depth considered flooding for the current location
         :return: FloodStates - the new flood state
         """
+        #pylint: disable=R0912
+        #allow too many branches
         calc_state = prior_state
         if max([current_level] + forecast) < warn_threshold:  # check if need to warn
             if prior_state >= FloodStates.WET:
