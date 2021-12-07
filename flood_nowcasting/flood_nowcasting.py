@@ -167,23 +167,37 @@ class FloodNowcasting:
         :return: FloodStates - the new flood state
         """
         calc_state = prior_state
-        if current_level < warn_threshold:  # check if need to warn
-            if prior_state == FloodStates.DRY and max(forecast) > warn_threshold:
-                calc_state = FloodStates.WARN
+        if max([current_level] + forecast) < warn_threshold:  # check if need to warn
+            if prior_state >= FloodStates.WET:
+                calc_state = FloodStates.CARE
             else:
                 calc_state = FloodStates.DRY
-        elif current_level < wet_threshold:  # check if warning issued
-            if prior_state > FloodStates.CARE:  # may be passable
-                calc_state = FloodStates.CARE
+        elif current_level < wet_threshold and max(forecast) > warn_threshold:
+            if prior_state >= FloodStates.CARE:  # may be passable
+                if max(forecast) > wet_threshold and prior_state < FloodStates.WET:
+                    calc_state = FloodStates.WARN
+                else:
+                    calc_state = FloodStates.CARE
             elif prior_state == FloodStates.DRY:  # issue warning
                 calc_state = FloodStates.WARN
-        elif prior_state >= FloodStates.WET:  # check if dry soon
-            if max(forecast) < wet_threshold:  # down in 30 mins
-                calc_state = FloodStates.CLEAR_VERY_SOON
-            elif forecast[1] < wet_threshold:  # down in an hour
-                calc_state = FloodStates.CLEAR_SOON
+        elif warn_threshold <= current_level < wet_threshold: # forecast not over the limit
+            if prior_state >= FloodStates.CARE:
+                calc_state = FloodStates.CARE
+            else:
+                calc_state = FloodStates.WARN
         elif current_level >= wet_threshold:
-            calc_state = FloodStates.WET
+            if prior_state < FloodStates.WET:
+                calc_state = FloodStates.WET
+            else:
+                if prior_state >= FloodStates.WET:  # check if dry soon
+                    if max(forecast) < wet_threshold:  # down in 30 mins
+                        calc_state = FloodStates.CLEAR_VERY_SOON
+                    elif forecast[1] < wet_threshold:  # down in an hour
+                        calc_state = FloodStates.CLEAR_SOON
+                    else:
+                        calc_state = FloodStates.WET
+                elif current_level >= wet_threshold:
+                    calc_state = FloodStates.WET
         return calc_state
 
     def publish(self, message: str):

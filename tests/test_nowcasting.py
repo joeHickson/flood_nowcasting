@@ -2,7 +2,7 @@ import unittest
 
 from entities import FloodStates
 from flood_nowcasting.flood_nowcasting import FloodNowcasting
-from tests.data_fixtures import EXE_SAMPLE_X, EXE_SAMPLE_Y, EXE_SAMPLE_OUTCOME, get_flat
+from tests.data_fixtures import EXE_SAMPLE_X, EXE_SAMPLE_Y, EXE_SAMPLE_OUTCOME, get_flat, ALL_STATES
 
 
 class TestNowcasting(unittest.TestCase):
@@ -39,6 +39,19 @@ class TestNowcasting(unittest.TestCase):
             self.assertAlmostEqual(EXE_SAMPLE_OUTCOME[i]['forecast'][0], forecast[0], delta=0.01)
             self.assertAlmostEqual(EXE_SAMPLE_OUTCOME[i]['forecast'][1], forecast[1], delta=0.01)
             self.assertEqual(EXE_SAMPLE_OUTCOME[i]['state'], state)
+
+    def test_all_possible_states(self):
+        self.maxDiff = None
+        for prior_state, current_level, forecast, warn, wet, outcome_state in ALL_STATES:
+            state = self.flood_nowcasting.calculate_new_state(
+                prior_state=prior_state,
+                current_level=current_level,
+                forecast=forecast,
+                warn_threshold=warn,
+                wet_threshold=wet
+            )
+            self.assertEqual(outcome_state,state,
+                             f"{prior_state.name}, {current_level}, [{forecast[0]},{forecast[1]}], {warn}, {wet}, {outcome_state.name}")
 
 
 if __name__ == '__main__':
