@@ -55,8 +55,8 @@ class FloodNowcasting:
                 wet_threshold=location.wet
             )
 
-            logging.debug("station %s old state:%s new state:%s", location.name, current_output_state.name,
-                          new_state.name)
+            logging.info("station %s old state:%s new state:%s  %s m [%s, %s] - threshold %s / %s", location.name, current_output_state.name,
+                          new_state.name, current_level, forecast_levels[0], forecast_levels[1], location.warn, location.wet)
             if new_state != current_output_state:  # publicise change:
                 message = location.get_message(new_state)
                 message += message_suffix
@@ -169,7 +169,7 @@ class FloodNowcasting:
         #pylint: disable=R0912
         #allow too many branches
         calc_state = prior_state
-        if max([current_level] + forecast) < warn_threshold:  # check if need to warn
+        if max([current_level] + list(forecast)) < warn_threshold:  # check if need to warn
             if prior_state >= FloodStates.WET:
                 calc_state = FloodStates.CARE
             else:
