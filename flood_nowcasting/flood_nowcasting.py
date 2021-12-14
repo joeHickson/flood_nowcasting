@@ -55,8 +55,10 @@ class FloodNowcasting:
                 wet_threshold=location.wet
             )
 
-            logging.info("station %s old state:%s new state:%s  %s m [%s, %s] - threshold %s / %s", location.name, current_output_state.name,
-                          new_state.name, current_level, forecast_levels[0], forecast_levels[1], location.warn, location.wet)
+            logging.info("station %s old state:%s new state:%s  %s m [%s, %s] - threshold %s / %s", location.name,
+                         current_output_state.name,
+                         new_state.name, current_level, forecast_levels[0], forecast_levels[1], location.warn,
+                         location.wet)
             if new_state != current_output_state:  # publicise change:
                 message = location.get_message(new_state)
                 message += message_suffix
@@ -166,8 +168,8 @@ class FloodNowcasting:
         :param wet_threshold: float - the water depth considered flooding for the current location
         :return: FloodStates - the new flood state
         """
-        #pylint: disable=R0912
-        #allow too many branches
+        # pylint: disable=R0912
+        # allow too many branches
         calc_state = prior_state
         if max([current_level] + list(forecast)) < warn_threshold:  # check if need to warn
             if prior_state >= FloodStates.WET:
@@ -182,7 +184,7 @@ class FloodNowcasting:
                     calc_state = FloodStates.CARE
             elif prior_state == FloodStates.DRY:  # issue warning
                 calc_state = FloodStates.WARN
-        elif warn_threshold <= current_level < wet_threshold: # forecast not over the limit
+        elif warn_threshold <= current_level < wet_threshold:  # forecast not over the limit
             if prior_state >= FloodStates.CARE:
                 calc_state = FloodStates.CARE
             else:
