@@ -143,8 +143,6 @@ class FloodNowcasting:
         :param suffix_len: int - how much to trim off the end
         :return: FloodStates
         """
-        match = None
-        recent = self.api.user_timeline(user_id='ExeFloodChannel')
         for page in tweepy.Cursor(self.api.user_timeline, user_id='ExeFloodChannel').pages():
             for tweet in page:
                 if len(tweet.text) > suffix_len and tweet.text[:suffix_len * -1] in location.messages.values():
