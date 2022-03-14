@@ -145,16 +145,14 @@ class FloodNowcasting:
         """
         match = None
         recent = self.api.user_timeline(user_id='ExeFloodChannel')
-        for tweet in recent:
-            if len(tweet.text) > suffix_len and tweet.text[:suffix_len * -1] in location.messages.values():
-                for state in location.messages.keys():
-                    if location.messages[state] == tweet.text[:suffix_len * -1]:
-                        match = state
-                        break
-            if match:
-                break
-
-        return match
+        for page in tweepy.Cursor(self.api.user_timeline, user_id='ExeFloodChannel').pages():
+            for tweet in page:
+                if len(tweet.text) > suffix_len and tweet.text[:suffix_len * -1] in location.messages.values():
+                    for state in location.messages.keys():
+                        if location.messages[state] == tweet.text[:suffix_len * -1]:
+                            return state
+        # can't find a prior state - set to dry
+        return FloodStates.DRY
 
     @staticmethod
     def calculate_new_state(prior_state: FloodStates, current_level: float, forecast: ndarray, warn_threshold: float,
